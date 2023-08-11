@@ -4,10 +4,11 @@ export default {
   theme: {
     colors: {
       text: "rgb(5, 4, 11)",
-      background: "rgb(243, 240, 255)",
+      background: "#f1f2f3",
       primary: "rgb(52, 30, 178)",
       secondary: "rgb(210, 210, 239)",
       accent: "rgb(54, 36, 155)",
+      clrWhite: "rgb(255,255,255)",
     },
     extend: {},
   },

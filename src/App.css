@@ -1,3 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+  background-color: white;
+}
+
+* {
+  /* outline: 1px dashed red; */
+}
+
+.nav-bleed {
+  box-shadow: 0 0 0 100vmax rgb(255, 255, 255);
+  clip-path: inset(0 -100vmax);
+}
