@@ -14,11 +14,6 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 
 async function init() {
-  // const auth0 = await createAuth0Client({
-  //   domain: "dev-yzign61bxo3stxcg.au.auth0.com",
-  //   clientId: "wAniSj9oKbPpOZtq2oi3yTUzBJPXSfyX",
-  // });
-
   const root = createRoot(document.getElementById("root"));
 
   root.render(
