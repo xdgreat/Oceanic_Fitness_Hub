@@ -1,10 +1,17 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import { connectDB, closeDB, getDB } from "./db.js";
+import { connectDB, closeDB, getDB } from "./backend/Database/db.js";
 import session from "express-session";
-import bcrypt from "bcryptjs";
 import MongoDBSessionStore from "connect-mongodb-session";
+import login from "./backend/Routes/login.js";
+import registerRouter from "./backend/Routes/register.js";
+import authRouter, { isLoggedIn } from "./backend/Routes/authroutes.js";
+import dashboardRoute from "./backend/Routes/dashboardsetup.js";
+import isLoggedRoute from "./backend/Routes/isloggedin.js";
+import caloriesRoute from "./backend/Routes/caloriesfetch.js";
+
+import userRoute from "./backend/Routes/user.js";
 
 const MongoDBStore = MongoDBSessionStore(session);
 
@@ -39,6 +46,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       sameSite: "strict",
+      secure: false,
     },
     store: store,
     resave: true,
@@ -46,83 +54,13 @@ app.use(
   })
 );
 
-app.post("/login", async (req, res) => {
-  const db = getDB();
-  const collection = db.collection("users");
-  if (!req.body.username || !req.body.password)
-    res.status(400).send("Missing Username or Password");
-  else {
-    let { username, password } = req.body;
-
-    const user = await collection.findOne({ username: username });
-    console.log(user);
-
-    if (!user) {
-      res.status(404).send({ message: "No  User Found" });
-    } else {
-      let validatePassword = await bcrypt.compare(password, user.password);
-      console.log(`user: ${password}, db: ${user.password}`);
-      if (!validatePassword) {
-        res.status(400).send({ message: "Invalid Password" });
-        console.log("invalid pw");
-      } else {
-        const user = { username: req.body.username };
-        req.session.logged = true;
-        req.session.username = user.username;
-        req.session.cookie.expires = 30 * 24 * 60 * 60 * 1000;
-        req.session.save();
-
-        console.log(`User authenticated: ${user.username}`);
-        console.log(req.session);
-        res.json({
-          success: true,
-          username: user.username,
-        });
-      }
-    }
-  }
-});
-
-app.post("/register", async (req, res) => {
-  const db = getDB();
-  const collection = db.collection("users");
-
-  let { username, password } = req.body;
-
-  const user = await collection.insertOne({
-    username: username,
-    password: password,
-  });
-
-  console.log(user);
-
-  console.log("user authenticated");
-  res.cookie("username", username, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    secure: true,
-    httpOnly: true,
-    sameSite: "lax",
-  });
-  res.redirect("/");
-});
-
-app.get("/allusers", async (req, res) => {
-  try {
-    const db = getDB();
-    const collection = db.collection("users");
-
-    console.log(req.session.username);
-    const allUsers = await collection.find({}).toArray();
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-app.get("/test", async (req, res) => {
-  console.log(req.session);
-  console.log(req.session.username);
-});
+app.use("/api", login);
+app.use("/api", registerRouter);
+app.use("/api", authRouter);
+app.use("/api", dashboardRoute);
+app.use("/api", userRoute);
+app.use("/api", isLoggedRoute);
+app.use("/api", caloriesRoute);
 
 app.listen(port, async () => {
   await connectDB();

@@ -1,35 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import BottomNav from "../components/BottomNav";
+import { StoreContext } from "../store";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+  const [{ loginResponse }, dispatch] = useContext(StoreContext);
 
   useEffect(() => {
     document.title = "Login | Oceanic Fitness Hub";
-  });
+  }, []);
 
   async function tryLogin() {
-    const loginRes = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    dispatch({
+      type: "LOGIN",
+      payload: {
+        email: loginData.email,
+        password: loginData.password,
       },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-      credentials: "include",
-    }).then((res) => res.json());
-
-    if (loginRes.success) {
-      return {
-        auth: { isLoggedIn: true, username: username },
-      };
-    } else {
-      console.error(loginRes.error);
-    }
+    });
   }
 
   return (
@@ -41,31 +33,27 @@ const Login = () => {
           <div className="input-group mb-3">
             <span
               className="input-group-text justify-content-center"
-              id="username-prefix"
-              style={{
-                width: "2.5rem",
-              }}
+              id="email-prefix"
             >
               @
             </span>
             <input
               type="text"
-              name="username"
+              name="email"
               className="form-control"
-              placeholder="Username"
-              aria-label="Username"
-              aria-describedby="username-prefix"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              placeholder="Email"
+              aria-label="Email"
+              aria-describedby="email-prefix"
+              value={loginData.email}
+              onChange={(event) =>
+                setLoginData({ ...loginData, email: event.target.value })
+              }
             />
           </div>
           <div className="input-group mb-3">
             <span
               className="input-group-text justify-content-center"
               id="password-prefix"
-              style={{
-                width: "2.5rem",
-              }}
             >
               *
             </span>
@@ -76,8 +64,10 @@ const Login = () => {
               aria-describedby="password-prefix"
               placeholder="Password..."
               aria-label="Password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              value={loginData.password}
+              onChange={(event) =>
+                setLoginData({ ...loginData, password: event.target.value })
+              }
             />
           </div>
           <div className="d-grid gap-2">
@@ -91,6 +81,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <div>Response: {JSON.stringify(loginResponse)}</div>
       <BottomNav />
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import Hamburger from "./Hamburger";
 import { Link } from "react-router-dom";
+import LoginLogout from "./LoginLogout";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -25,9 +26,8 @@ const Navbar = () => {
         >
           Oceanic Fitness Hub
         </Link>
-        <Link to={"/login"} className="flex items-center">
-          Login
-        </Link>
+        <LoginLogout />
+
         {isDropdownOpen && (
           <div className=" text-md absolute left-0 top-16 flex w-full flex-col flex-wrap items-start bg-clrWhite text-start">
             <Link
